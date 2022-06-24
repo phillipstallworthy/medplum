@@ -1,5 +1,5 @@
 import { ActionIcon, Group, Loader, Menu, ScrollArea, TextInput } from '@mantine/core';
-import { getReferenceString, ProfileResource } from '@medplum/core';
+import { getReferenceString, MedplumClient, ProfileResource } from '@medplum/core';
 import {
   Attachment,
   AuditEvent,
@@ -38,7 +38,7 @@ import './ResourceTimeline.css';
 
 export interface ResourceTimelineProps<T extends Resource> {
   value: T | Reference<T>;
-  buildSearchRequests: (resource: T) => Bundle;
+  loadTimelineResources: (medplum: MedplumClient, resource: T) => Promise<Bundle[]>;
   createCommunication?: (resource: T, sender: ProfileResource, text: string) => Communication;
   createMedia?: (resource: T, operator: ProfileResource, attachment: Attachment) => Media;
 }
@@ -51,7 +51,7 @@ export function ResourceTimeline<T extends Resource>(props: ResourceTimelineProp
   const resource = useResource(props.value);
   const [history, setHistory] = useState<Bundle>();
   const [items, setItems] = useState<Resource[]>([]);
-  const buildSearchRequests = props.buildSearchRequests;
+  const loadTimelineResources = props.loadTimelineResources;
 
   const itemsRef = useRef<Resource[]>(items);
   itemsRef.current = items;
@@ -62,8 +62,8 @@ export function ResourceTimeline<T extends Resource>(props: ResourceTimelineProp
       setHistory({} as Bundle);
       return;
     }
-    medplum.executeBatch(buildSearchRequests(resource)).then(handleBatchResponse).catch(console.log);
-  }, [medplum, resource, buildSearchRequests]);
+    loadTimelineResources(medplum, resource).then(handleBatchResponse).catch(console.log);
+  }, [medplum, resource, loadTimelineResources]);
 
   useEffect(() => {
     loadTimeline();
@@ -73,34 +73,28 @@ export function ResourceTimeline<T extends Resource>(props: ResourceTimelineProp
    * Handles a batch request response.
    * @param batchResponse The batch response.
    */
-  function handleBatchResponse(batchResponse: Bundle): void {
+  function handleBatchResponse(bundles: Bundle[]): void {
     const newItems = [];
 
-    if (batchResponse.entry) {
-      for (const batchEntry of batchResponse.entry) {
-        const bundle = batchEntry.resource as Bundle;
-        if (!bundle) {
-          // User may not have access to all resource types
-          continue;
-        }
-
-        if (bundle.type === 'history') {
-          setHistory(bundle);
-        }
-
-        if (bundle.entry) {
-          for (const entry of bundle.entry) {
-            if (entry.resource) {
-              newItems.push(entry.resource);
-            }
-          }
-        }
+    for (const bundle of bundles) {
+      if (!bundle) {
+        // User may not have access to all resource types
+        continue;
       }
 
-      sortByDateAndPriority(newItems);
-      newItems.reverse();
+      if (bundle.type === 'history') {
+        setHistory(bundle);
+      }
+
+      if (bundle.entry) {
+        for (const entry of bundle.entry) {
+          newItems.push(entry.resource as Resource);
+        }
+      }
     }
 
+    sortByDateAndPriority(newItems);
+    newItems.reverse();
     setItems(newItems);
   }
 

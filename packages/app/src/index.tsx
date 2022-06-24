@@ -25,6 +25,8 @@ if ('serviceWorker' in navigator) {
 const medplum = new MedplumClient({
   baseUrl: process.env.MEDPLUM_BASE_URL as string,
   clientId: process.env.MEDPLUM_CLIENT_ID as string,
+  cacheTime: 60000,
+  autoBatchTime: 100,
   onUnauthenticated: () => (window.location.href = '/signin'),
 });
 

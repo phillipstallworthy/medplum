@@ -10,6 +10,7 @@ import {
   Questionnaire,
   RequestGroup,
   Resource,
+  ResourceType,
   ServiceRequest,
 } from '@medplum/fhirtypes';
 import {
@@ -31,9 +32,8 @@ import {
   ServiceRequestTimeline,
   useMedplum,
 } from '@medplum/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Loading } from '../components/Loading';
 import { PatientHeader } from '../components/PatientHeader';
 import { QuickServiceRequests } from '../components/QuickServiceRequests';
 import { QuickStatus } from '../components/QuickStatus';
@@ -75,60 +75,43 @@ function getTabs(resourceType: string): string[] {
 }
 
 export function ResourcePage(): JSX.Element {
-  const navigate = useNavigate();
-  const { resourceType, id, tab } = useParams() as {
-    resourceType: string;
+  const { resourceType, id } = useParams() as {
+    resourceType: ResourceType;
     id: string;
-    tab: string;
   };
   const medplum = useMedplum();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [value, setValue] = useState<Resource | undefined>();
-  const [historyBundle, setHistoryBundle] = useState<Bundle | undefined>();
+  const valueRequest = medplum.readResource(resourceType, id);
+  const historyRequest = medplum.readHistory(resourceType, id);
+  const questionnaireRequest = medplum.search('Questionnaire', 'subject-type=' + resourceType);
+  const value = valueRequest.read();
+  const historyBundle = historyRequest.read();
+  const questionnaires = questionnaireRequest.read();
+
+  return (
+    <ResourcePageBody
+      resourceType={resourceType}
+      id={id}
+      value={value}
+      historyBundle={historyBundle}
+      questionnaires={questionnaires}
+    />
+  );
+}
+
+interface ResourcePageBodyProps {
+  resourceType: ResourceType;
+  id: string;
+  value: Resource | undefined;
+  historyBundle: Bundle | undefined;
+  questionnaires: Bundle<Questionnaire> | undefined;
+}
+
+function ResourcePageBody(props: ResourcePageBodyProps): JSX.Element {
+  const { resourceType, id, value, historyBundle } = props;
+  const navigate = useNavigate();
+  const medplum = useMedplum();
+  const { tab } = useParams() as { tab: string };
   const [error, setError] = useState<OperationOutcome | undefined>();
-
-  const loadResource = useCallback(() => {
-    setError(undefined);
-    setLoading(true);
-
-    // Build a batch request
-    // 1) Read the resource
-    // 2) Read the history
-    const requestBundle: Bundle = {
-      resourceType: 'Bundle',
-      type: 'batch',
-      entry: [
-        {
-          request: {
-            method: 'GET',
-            url: `${resourceType}/${id}`,
-          },
-        },
-        {
-          request: {
-            method: 'GET',
-            url: `${resourceType}/${id}/_history`,
-          },
-        },
-      ],
-    };
-
-    medplum
-      .executeBatch(requestBundle)
-      .then((responseBundle: Bundle) => {
-        if (responseBundle.entry?.[0]?.response?.status !== '200') {
-          setError(responseBundle.entry?.[0]?.response?.outcome as OperationOutcome);
-        } else {
-          setValue(responseBundle.entry?.[0]?.resource);
-        }
-        setHistoryBundle(responseBundle.entry?.[1]?.resource as Bundle);
-        setLoading(false);
-      })
-      .catch((reason) => {
-        setError(reason);
-        setLoading(false);
-      });
-  }, [medplum, resourceType, id]);
 
   /**
    * Handles a tab change event.
@@ -141,9 +124,11 @@ export function ResourcePage(): JSX.Element {
   function onSubmit(newResource: Resource): void {
     medplum
       .updateResource(cleanResource(newResource))
-      .then(loadResource)
       .then(() => showNotification({ color: 'green', message: 'Success' }))
-      .catch((err) => showNotification({ color: 'red', message: normalizeErrorString(err) }));
+      .catch((err) => {
+        setError(err);
+        showNotification({ color: 'red', message: normalizeErrorString(err) });
+      });
   }
 
   function restoreResource(): void {
@@ -165,14 +150,6 @@ export function ResourcePage(): JSX.Element {
       orderDetail[0].text = status;
       onSubmit({ ...serviceRequest, orderDetail });
     }
-  }
-
-  useEffect(() => {
-    loadResource();
-  }, [loadResource]);
-
-  if (loading) {
-    return <Loading />;
   }
 
   if (error && isGone(error)) {
