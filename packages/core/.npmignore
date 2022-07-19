@@ -6,4 +6,5 @@ src/
 babel.config.json
 jest.config.json
 rollup.config.js
+stats.html
 tsconfig.json

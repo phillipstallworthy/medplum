@@ -32,7 +32,7 @@ export default {
     {
       file: 'dist/esm/index.min.js',
       format: 'esm',
-      plugins: [terser()],
+      plugins: [terser(), visualizer({ gzipSize: true })],
       sourcemap: true,
     },
     {
@@ -78,7 +78,6 @@ export default {
         writeFileSync('./dist/esm/package.json', '{"type": "module"}');
       },
     },
-    visualizer({ gzipSize: true }),
   ],
   external: Object.keys(globals),
 };
