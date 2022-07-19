@@ -13,6 +13,7 @@ node_modules/
 packages/app/dist/
 packages/cli/dist/
 packages/core/dist/
+packages/core/stats.html
 packages/core/docs/
 packages/definitions/dist/**/*.js
 packages/definitions/dist/**/*.js.map
@@ -23,6 +24,7 @@ packages/infra/dist/
 packages/mock/dist/
 packages/seeder/dist/
 packages/react/dist/
+packages/react/stats.html
 packages/server/dist/
 
 # Storybook output

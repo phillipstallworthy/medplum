@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import { mkdirSync, writeFileSync } from 'fs';
 import { terser } from 'rollup-plugin-terser';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const extensions = ['.ts'];
 
@@ -45,6 +46,7 @@ export default {
     json(),
     resolve({ extensions }),
     typescript({ resolveJsonModule: true }),
+    visualizer(),
     {
       buildEnd: () => {
         mkdirSync('./dist/cjs', { recursive: true });

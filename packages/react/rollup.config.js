@@ -7,6 +7,7 @@ import copy from 'rollup-plugin-copy';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import postcss from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ export default {
     postcss({ extract: 'styles.css' }),
     resolve({ extensions }),
     typescript(),
+    visualizer(),
     copy({
       targets: [
         { src: 'src/defaulttheme.css', dest: 'dist/esm/' },
