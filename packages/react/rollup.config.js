@@ -64,7 +64,6 @@ export default {
     postcss({ extract: 'styles.css' }),
     resolve({ extensions }),
     typescript(),
-    visualizer(),
     copy({
       targets: [
         { src: 'src/defaulttheme.css', dest: 'dist/esm/' },
@@ -79,6 +78,7 @@ export default {
         writeFileSync('./dist/esm/package.json', '{"type": "module"}');
       },
     },
+    visualizer({ gzipSize: true }),
   ],
   external: Object.keys(globals),
 };

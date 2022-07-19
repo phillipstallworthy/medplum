@@ -46,7 +46,6 @@ export default {
     json(),
     resolve({ extensions }),
     typescript({ resolveJsonModule: true }),
-    visualizer(),
     {
       buildEnd: () => {
         mkdirSync('./dist/cjs', { recursive: true });
@@ -55,6 +54,7 @@ export default {
         writeFileSync('./dist/esm/package.json', '{"type": "module"}');
       },
     },
+    visualizer({ gzipSize: true }),
   ],
   external: Object.keys(globals),
 };
