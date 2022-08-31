@@ -50,10 +50,11 @@ export class TokenTable extends LookupTable<Token> {
   /**
    * Returns true if the search parameter is an "token" parameter.
    * @param searchParam The search parameter.
+   * @param resourceType The resource type.
    * @returns True if the search parameter is an "token" parameter.
    */
-  isIndexed(resourceType: string, searchParam: SearchParameter): boolean {
-    return isIndexed(resourceType, searchParam);
+  isIndexed(searchParam: SearchParameter, resourceType: string): boolean {
+    return isIndexed(searchParam, resourceType);
   }
 
   /**
@@ -134,9 +135,10 @@ export class TokenTable extends LookupTable<Token> {
 /**
  * Returns true if the search parameter is an "token" parameter.
  * @param searchParam The search parameter.
+ * @param resourceType The resource type.
  * @returns True if the search parameter is an "token" parameter.
  */
-function isIndexed(resourceType: string, searchParam: SearchParameter): boolean {
+function isIndexed(searchParam: SearchParameter, resourceType: string): boolean {
   if (searchParam.type !== 'token') {
     return false;
   }
@@ -179,7 +181,7 @@ function getTokens(resource: Resource): Token[] {
   const result: Token[] = [];
   if (searchParams) {
     for (const searchParam of Object.values(searchParams)) {
-      if (isIndexed(resource.resourceType, searchParam)) {
+      if (isIndexed(searchParam, resource.resourceType)) {
         const typedValues = evalFhirPathTyped(searchParam.expression as string, typedResource);
         for (const typedValue of typedValues) {
           buildTokens(result, searchParam, typedValue);
