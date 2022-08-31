@@ -170,7 +170,7 @@ const protectedResourceTypes = ['JsonWebKey', 'Login', 'PasswordChangeRequest', 
 /**
  * The lookup tables array includes a list of special tables for search indexing.
  */
-const lookupTables: LookupTable[] = [new AddressTable(), new HumanNameTable(), new TokenTable()];
+const lookupTables: LookupTable<unknown>[] = [new AddressTable(), new HumanNameTable(), new TokenTable()];
 
 /**
  * Defines the maximum number of resources returned in a single search result.
@@ -1410,7 +1410,7 @@ export class Repository {
     return !!this.#getLookupTable(resourceType, searchParam);
   }
 
-  #getLookupTable(resourceType: string, searchParam: SearchParameter): LookupTable | undefined {
+  #getLookupTable(resourceType: string, searchParam: SearchParameter): LookupTable<unknown> | undefined {
     for (const lookupTable of lookupTables) {
       if (lookupTable.isIndexed(resourceType, searchParam)) {
         return lookupTable;
