@@ -8,7 +8,6 @@ src/
 storybook-static/
 .env
 .env.defaults
-babel.config.json
 jest.config.json
 rollup.config.js
 tsconfig.cjs.json

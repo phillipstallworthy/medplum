@@ -86,7 +86,7 @@ export default (env, argv) => ({
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: '/node_modules/',
-        loader: 'babel-loader',
+        loader: 'swc-loader',
       },
       {
         test: /\.css$/i,
