@@ -6,6 +6,7 @@ import { CreateBotPage } from './admin/CreateBotPage';
 import { CreateClientPage } from './admin/CreateClientPage';
 import { EditMembershipPage } from './admin/EditMembershipPage';
 import { InvitePage } from './admin/InvitePage';
+import { MfaPage } from './admin/MfaPage';
 import { PatientsPage } from './admin/PatientsPage';
 import { ProjectDetailsPage } from './admin/ProjectDetailsPage';
 import { ProjectPage } from './admin/ProjectPage';
@@ -57,6 +58,7 @@ export function AppRoutes(): JSX.Element {
         <Route path="secrets" element={<SecretsPage />} />
         <Route path="sites" element={<SitesPage />} />
         <Route path="members/:membershipId" element={<EditMembershipPage />} />
+        <Route path="mfa" element={<MfaPage />} />
       </Route>
       <Route path="/lab/assays" element={<AssaysPage />} />
       <Route path="/lab/panels" element={<PanelsPage />} />

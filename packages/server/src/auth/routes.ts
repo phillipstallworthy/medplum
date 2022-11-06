@@ -6,6 +6,7 @@ import { changePasswordHandler, changePasswordValidators } from './changepasswor
 import { googleHandler, googleValidators } from './google';
 import { loginHandler, loginValidators } from './login';
 import { meHandler } from './me';
+import { mfaRouter } from './mfa';
 import { newPatientHandler, newPatientValidators } from './newpatient';
 import { newProjectHandler, newProjectValidators } from './newproject';
 import { newUserHandler, newUserValidators } from './newuser';
@@ -16,6 +17,7 @@ import { setPasswordHandler, setPasswordValidators } from './setpassword';
 
 export const authRouter = Router();
 authRouter.use(getRateLimiter());
+authRouter.use('/mfa', authenticateToken, mfaRouter);
 authRouter.get('/me', authenticateToken, asyncWrap(meHandler));
 authRouter.post('/newuser', newUserValidators, asyncWrap(newUserHandler));
 authRouter.post('/newproject', newProjectValidators, asyncWrap(newProjectHandler));
