@@ -1,4 +1,6 @@
 import { Button, Center, Group, TextInput, Title } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
+import { normalizeErrorString } from '@medplum/core';
 import { Document, Form, useMedplum } from '@medplum/react';
 import React, { useEffect, useState } from 'react';
 
@@ -19,7 +21,7 @@ export function MfaPage(): JSX.Element | null {
         setQrCodeUrl(url.toString());
         setEnrolled(response.enrolled);
       })
-      .catch(console.log);
+      .catch((err) => showNotification({ color: 'red', message: normalizeErrorString(err) }));
   }, [medplum]);
 
   if (enrolled === undefined) {
@@ -39,14 +41,13 @@ export function MfaPage(): JSX.Element | null {
     <Document width={400}>
       <Form
         onSubmit={(formData: Record<string, string>) => {
-          console.log('SUBMIT', formData);
           medplum
             .post('auth/mfa/enroll', formData)
-            .then((res) => {
-              console.log('RES', res);
+            .then(() => {
               setEnrolled(true);
+              showNotification({ color: 'green', message: 'Success' });
             })
-            .catch((err) => console.log('error', err));
+            .catch((err) => showNotification({ color: 'red', message: normalizeErrorString(err) }));
         }}
       >
         <Title>Multi Factor Auth Setup</Title>
