@@ -1,5 +1,5 @@
-import { Button, Group, TextInput, Title } from '@mantine/core';
-import { Form, useMedplum } from '@medplum/react';
+import { Button, Center, Group, TextInput, Title } from '@mantine/core';
+import { Document, Form, useMedplum } from '@medplum/react';
 import React, { useEffect, useState } from 'react';
 
 export function MfaPage(): JSX.Element | null {
@@ -36,24 +36,28 @@ export function MfaPage(): JSX.Element | null {
   }
 
   return (
-    <Form
-      onSubmit={(formData: Record<string, string>) => {
-        console.log('SUBMIT', formData);
-        medplum
-          .post('auth/mfa/enroll', formData)
-          .then((res) => {
-            console.log('RES', res);
-            setEnrolled(true);
-          })
-          .catch((err) => console.log('error', err));
-      }}
-    >
-      <Title>MFA Test</Title>
-      <img src={qrCodeUrl as string} />
-      <TextInput name="token" label="Code" />
-      <Group position="right">
-        <Button type="submit">Test</Button>
-      </Group>
-    </Form>
+    <Document width={400}>
+      <Form
+        onSubmit={(formData: Record<string, string>) => {
+          console.log('SUBMIT', formData);
+          medplum
+            .post('auth/mfa/enroll', formData)
+            .then((res) => {
+              console.log('RES', res);
+              setEnrolled(true);
+            })
+            .catch((err) => console.log('error', err));
+        }}
+      >
+        <Title>Multi Factor Auth Setup</Title>
+        <Center>
+          <img src={qrCodeUrl as string} />
+        </Center>
+        <TextInput name="token" label="Code" />
+        <Group position="right" mt="xl">
+          <Button type="submit">Enroll</Button>
+        </Group>
+      </Form>
+    </Document>
   );
 }

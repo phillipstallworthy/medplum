@@ -42,6 +42,7 @@ export function AppRoutes(): JSX.Element {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/changepassword" element={<ChangePasswordPage />} />
       <Route path="/security" element={<SecurityPage />} />
+      <Route path="mfa" element={<MfaPage />} />
       <Route path="/batch" element={<BatchPage />} />
       <Route path="/bulk/:resourceType" element={<BulkAppPage />} />
       <Route path="/smart" element={<SmartSearchPage />} />
@@ -60,7 +61,6 @@ export function AppRoutes(): JSX.Element {
         <Route path="secrets" element={<SecretsPage />} />
         <Route path="sites" element={<SitesPage />} />
         <Route path="members/:membershipId" element={<EditMembershipPage />} />
-        <Route path="mfa" element={<MfaPage />} />
       </Route>
       <Route path="/lab/assays" element={<AssaysPage />} />
       <Route path="/lab/panels" element={<PanelsPage />} />
